@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM History 01 &mdash; Introduction &amp; Four Eras</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0a; --bg-card: #0d1117; --bg-code: #161b22;
+            --text-primary: #e6edf3; --text-secondary: #8b949e;
+            --accent: #A371F7; --accent-dim: #A371F744; --accent-glow: #A371F733;
+            --accent-2: #FF7B72; --accent-3: #F0A726; --accent-4: #3FB950;
+            --border: #21262d;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+            --font-body: 'Inter', sans-serif;
+            --max-width: 900px;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-body); font-size: 17px; line-height: 1.7; overflow-x: hidden; }
+        .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem 1.5rem; text-align: center; position: relative; }
+        .hero::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 700px; height: 600px; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+        .hero > * { position: relative; z-index: 1; }
+        .series-label { font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem; }
+        .hero h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 700; color: var(--text-primary); line-height: 1.2; margin-bottom: 1rem; }
+        .hero h1 .accent { color: var(--accent); }
+        .hero .subtitle { font-size: 1.1rem; color: var(--text-secondary); max-width: 640px; margin-bottom: 2rem; }
+        .tags { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-bottom: 2.5rem; }
+        .tag { font-family: var(--font-mono); font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 999px; border: 1px solid var(--accent); color: var(--accent); background: var(--accent-dim); white-space: nowrap; }
+        .tag.r { border-color: var(--accent-2); color: var(--accent-2); background: rgba(255,123,114,0.10); }
+        .tag.y { border-color: var(--accent-3); color: var(--accent-3); background: rgba(240,167,38,0.10); }
+        .tag.g { border-color: var(--accent-4); color: var(--accent-4); background: rgba(63,185,80,0.10); }
+        .pipeline { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.25rem; margin-bottom: 1rem; max-width: var(--max-width); }
+        .pipeline-step { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.3rem 0.7rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; color: var(--text-secondary); white-space: nowrap; }
+        .pipeline-arrow { color: var(--accent); font-size: 0.9rem; font-weight: 700; }
+        .slide { min-height: 100vh; max-width: var(--max-width); margin: 0 auto; padding: 4rem 1.5rem; position: relative; display: flex; flex-direction: column; justify-content: center; }
+        .slide-number { font-family: var(--font-display); font-size: 5rem; font-weight: 700; color: var(--accent-dim); position: absolute; top: 2rem; right: 1.5rem; line-height: 1; user-select: none; }
+        .slide h2 { font-family: var(--font-display); font-size: 1.9rem; font-weight: 700; color: var(--accent); margin-bottom: 1.5rem; line-height: 1.25; }
+        .slide h3 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-top: 1.5rem; margin-bottom: 0.75rem; }
+        .slide p { margin-bottom: 1rem; color: var(--text-secondary); }
+        .slide p strong { color: var(--text-primary); }
+        .slide ul, .slide ol { margin-bottom: 1rem; padding-left: 1.5rem; color: var(--text-secondary); }
+        .slide li { margin-bottom: 0.4rem; }
+        .slide li strong { color: var(--text-primary); }
+        .table-wrap { overflow-x: auto; margin: 1.25rem 0; border-radius: 8px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th { background: var(--bg-code); color: var(--accent); font-weight: 600; text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); font-family: var(--font-display); white-space: nowrap; }
+        td { padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+        tr:last-child td { border-bottom: none; }
+        tr:nth-child(even) td { background: rgba(13, 17, 23, 0.5); }
+        .diagram-grid { display: grid; gap: 0.75rem; margin: 1.5rem 0; padding: 1.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; }
+        .diagram-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+        .diagram-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+        .diagram-grid.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+        .diagram-panel { padding: 1rem; background: var(--bg-code); border: 1px solid var(--border); border-radius: 6px; }
+        .diagram-panel.accent-border { border-left: 3px solid var(--accent); }
+        .diagram-panel.r { border-left: 3px solid var(--accent-2); }
+        .diagram-panel.y { border-left: 3px solid var(--accent-3); }
+        .diagram-panel.g { border-left: 3px solid var(--accent-4); }
+        .diagram-panel h4 { font-family: var(--font-display); font-size: 1rem; color: var(--accent); margin-bottom: 0.5rem; }
+        .diagram-panel.r h4 { color: var(--accent-2); }
+        .diagram-panel.y h4 { color: var(--accent-3); }
+        .diagram-panel.g h4 { color: var(--accent-4); }
+        .diagram-panel p, .diagram-panel ul { font-size: 0.9rem; }
+        .callout { background: var(--bg-card); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.25rem 0; }
+        .callout p { margin-bottom: 0; }
+        .callout .callout-label { font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.3rem; }
+        .callout.r { border-left-color: var(--accent-2); }
+        .callout.r .callout-label { color: var(--accent-2); }
+        .callout.y { border-left-color: var(--accent-3); }
+        .callout.y .callout-label { color: var(--accent-3); }
+        .callout.g { border-left-color: var(--accent-4); }
+        .callout.g .callout-label { color: var(--accent-4); }
+        .quote { font-family: var(--font-display); font-size: 1.15rem; font-style: italic; color: var(--text-primary); padding: 1rem 1.5rem; border-left: 3px solid var(--accent); background: var(--bg-card); margin: 1.25rem 0; border-radius: 0 8px 8px 0; }
+        .quote .attr { display: block; margin-top: 0.5rem; font-style: normal; font-size: 0.85rem; color: var(--text-secondary); font-family: var(--font-mono); }
+        .timeline { display: flex; flex-direction: column; gap: 0.5rem; padding: 1rem 0; }
+        .tl-row { display: flex; gap: 1rem; align-items: flex-start; padding: 0.6rem 0; border-bottom: 1px solid var(--border); }
+        .tl-year { font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent); min-width: 90px; padding-top: 0.1rem; }
+        .tl-event { flex: 1; }
+        .tl-event strong { color: var(--text-primary); }
+        .tl-event p { font-size: 0.9rem; color: var(--text-secondary); margin: 0; }
+        .contents-list { list-style: none; padding-left: 0; counter-reset: contents; }
+        .contents-list li { counter-increment: contents; padding: 0.6rem 0; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 1rem; }
+        .contents-list li:last-child { border-bottom: none; }
+        .contents-list li::before { content: counter(contents, decimal-leading-zero); font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent); min-width: 2rem; }
+        .contents-list a { color: var(--text-primary); text-decoration: none; }
+        .contents-list a:hover { color: var(--accent); }
+        .footer { text-align: center; padding: 3rem 1.5rem; color: var(--text-secondary); font-size: 0.85rem; border-top: 1px solid var(--border); max-width: var(--max-width); margin: 0 auto; }
+        .footer a { color: var(--accent); text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+        .canvas-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin: 1.25rem 0; overflow-x: auto; }
+        .canvas-wrap canvas, .canvas-wrap svg { display: block; margin: 0 auto; max-width: 100%; }
+        .person-card { display: grid; grid-template-columns: 90px 1fr; gap: 1rem; padding: 1rem; background: var(--bg-code); border: 1px solid var(--border); border-radius: 6px; margin-bottom: 0.6rem; }
+        .person-photo { width: 90px; height: 90px; border-radius: 50%; background: var(--accent-dim); border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 1.6rem; color: var(--accent); }
+        .person-card h4 { font-family: var(--font-display); margin-bottom: 0.2rem; color: var(--text-primary); }
+        .person-card .role { font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem; }
+        .person-card p { font-size: 0.88rem; margin: 0; }
+        .era-bar { display: flex; gap: 2px; margin: 1rem 0 1.5rem; height: 32px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); }
+        .era-seg { flex: 1; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-primary); padding: 0 0.4rem; }
+        .era-seg.e1 { background: rgba(255,123,114,0.30); flex: 0.55; }
+        .era-seg.e2 { background: rgba(240,167,38,0.30); flex: 0.14; }
+        .era-seg.e3 { background: rgba(163,113,247,0.30); flex: 0.05; }
+        .era-seg.e4 { background: rgba(63,185,80,0.30); flex: 0.04; }
+        @media (max-width: 640px) {
+            .slide { padding: 3rem 1rem; min-height: auto; }
+            .slide-number { font-size: 3rem; top: 1.5rem; right: 1rem; }
+            .slide h2 { font-size: 1.5rem; }
+            .diagram-grid.cols-2, .diagram-grid.cols-3, .diagram-grid.cols-4 { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 1.8rem; }
+            table { font-size: 0.78rem; }
+            .person-card { grid-template-columns: 60px 1fr; }
+            .person-photo { width: 60px; height: 60px; font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="hero">
+    <div class="series-label">LLM History Series &mdash; Presentation 01</div>
+    <h1>The <span class="accent">History of LLMs</span> &mdash; Four Eras, Two Hundred People</h1>
+    <p class="subtitle">An introductory map of a young, dense, still-moving field. The four eras of language modelling, the people thread that runs through all of them, and a guide to the nine decks that follow.</p>
+
+    <div class="tags">
+        <span class="tag">1948</span><span class="tag">2003</span><span class="tag">2017</span><span class="tag">2022</span>
+        <span class="tag g">Hinton</span><span class="tag g">Bengio</span><span class="tag g">LeCun</span>
+        <span class="tag y">Frontier labs</span>
+    </div>
+
+    <div class="pipeline">
+        <span class="pipeline-step">Symbolic / statistical (1948&ndash;2003)</span>
+        <span class="pipeline-arrow">&rarr;</span>
+        <span class="pipeline-step">Neural pre-transformer (2003&ndash;2017)</span>
+        <span class="pipeline-arrow">&rarr;</span>
+        <span class="pipeline-step">Transformer (2017&ndash;2022)</span>
+        <span class="pipeline-arrow">&rarr;</span>
+        <span class="pipeline-step">Scaled frontier (2022&ndash;)</span>
+    </div>
+</header>
+
+<section class="slide" id="slide-00">
+    <div class="slide-number">00</div>
+    <h2>What This Deck Covers</h2>
+    <p>This is the introduction to a ten-deck history of large language models. Its job is to put a frame around the rest of the series &mdash; the eras, the people, the lab geography &mdash; so each later deck can dive into one slice of the picture without re-explaining the whole.</p>
+    <ul class="contents-list">
+        <li><a href="#slide-01">Why LLM History is Worth Knowing</a></li>
+        <li><a href="#slide-02">The Four Eras at a Glance</a></li>
+        <li><a href="#slide-03">Era 1 &mdash; Symbolic &amp; Statistical NLP (1948&ndash;2003)</a></li>
+        <li><a href="#slide-04">Era 2 &mdash; Neural Language Models (2003&ndash;2017)</a></li>
+        <li><a href="#slide-05">Era 3 &mdash; The Transformer Era (2017&ndash;2022)</a></li>
+        <li><a href="#slide-06">Era 4 &mdash; Scaled Frontier &amp; Reasoning (2022&ndash;)</a></li>
+        <li><a href="#slide-07">The People Thread &mdash; The Three Godfathers</a></li>
+        <li><a href="#slide-08">The Lab Geography</a></li>
+        <li><a href="#slide-09">Three Threads Running Through It All</a></li>
+        <li><a href="#slide-10">Interactive Timeline</a></li>
+        <li><a href="#slide-11">How to Read the Rest of This Series</a></li>
+        <li><a href="#slide-12">Cheat Sheet</a></li>
+    </ul>
+</section>
+
+<section class="slide" id="slide-01">
+    <div class="slide-number">01</div>
+    <h2>Why LLM History is Worth Knowing</h2>
+    <p>The field is small, young, and unusually personal. <strong>Most of the technology you use today &mdash; transformers, RLHF, scaling laws, instruction tuning &mdash; was invented by a few hundred researchers across about a dozen labs over twelve years.</strong> If you know the names you can read the field; if you do not, half the references in any modern paper are opaque.</p>
+
+    <p>Three things make the history more useful than just trivia:</p>
+
+    <div class="diagram-grid cols-3">
+        <div class="diagram-panel accent-border">
+            <h4>1. Path dependence</h4>
+            <p>Decisions made in 2017&ndash;2020 (decoder-only, RLHF, the API-not-weights stance) shape what frontier models look like in 2026. Knowing why those choices were made tells you which are load-bearing and which are accidents.</p>
+        </div>
+        <div class="diagram-panel y">
+            <h4>2. Lineage</h4>
+            <p>A surprising fraction of LLM research traces to <strong>three advisors</strong> &mdash; Hinton, Bengio, LeCun &mdash; through their direct students. Reading a paper is much faster when you can place its authors in that family tree.</p>
+        </div>
+        <div class="diagram-panel g">
+            <h4>3. Personality</h4>
+            <p>Frontier labs are often tiny &mdash; OpenAI was 100 people when it shipped GPT-3, Anthropic 7 when it incorporated. The personalities of the founders explain choices that look mysterious from the outside.</p>
+        </div>
+    </div>
+
+    <div class="callout">
+        <div class="callout-label">A useful frame</div>
+        <p>You can teach the technology of LLMs without any history. But you cannot make sense of <strong>why the field looks the way it does</strong> &mdash; why there are exactly three US frontier labs, why Meta open-weights and OpenAI does not, why China caught up in eighteen months, why every Anthropic paper has an interpretability appendix &mdash; without it.</p>
+    </div>
+</section>
+
+<section class="slide" id="slide-02">
+    <div class="slide-number">02</div>
+    <h2>The Four Eras at a Glance</h2>
+    <p>Language modelling has moved through four overlapping eras since Shannon. The boundaries are fuzzy &mdash; statistical methods kept improving long after neural ones existed, and pre-transformer neural NLP is still in production at companies that never updated. But the centres of gravity are clear.</p>
+
+    <div class="era-bar">
+        <div class="era-seg e1">Symbolic / Statistical &middot; 1948&ndash;2003</div>
+        <div class="era-seg e2">Neural pre-Transformer &middot; 2003&ndash;2017</div>
+        <div class="era-seg e3">Transformer &middot; 2017&ndash;2022</div>
+        <div class="era-seg e4">Scaled Frontier &middot; 2022&ndash;</div>
+    </div>
+
+    <div class="table-wrap">
+    <table>
+        <thead><tr><th>Era</th><th>Dominant model</th><th>Centre of gravity</th><th>Killer demo</th></tr></thead>
+        <tbody>
+            <tr><td>Symbolic / Statistical</td><td>n-grams, HMMs, IBM Models 1&ndash;5, log-linear</td><td>IBM Watson, Bell Labs, JHU CLSP, Microsoft Research</td><td>Google Translate (statistical, 2006)</td></tr>
+            <tr><td>Neural pre-Transformer</td><td>NPLM, RNN-LM, LSTM, seq2seq + Bahdanau attention</td><td>Toronto, Mila/Montreal, NYU, Stanford</td><td>Google Translate (neural, 2016)</td></tr>
+            <tr><td>Transformer</td><td>BERT, GPT-2/3, T5, encoder &amp; decoder variants</td><td>Google Brain &rarr; OpenAI &rarr; many</td><td>GPT-3 in-context learning (2020)</td></tr>
+            <tr><td>Scaled Frontier</td><td>Decoder-only + RLHF + tools + RL on chains-of-thought</td><td>OpenAI, Anthropic, Google DeepMind, Meta, DeepSeek, xAI</td><td>ChatGPT (Nov 2022) &rarr; o1/R1 (2024)</td></tr>
+        </tbody>
+    </table>
+    </div>
+
+    <div class="callout y">
+        <div class="callout-label">A note on the lengths</div>
+        <p>The first era is 55 years long; the most recent is barely four. Compute, data, and money have compressed the tempo. The expectation among people in the field is that this compression continues &mdash; deck 10 explores what it might mean.</p>
+    </div>
+</section>
+
+<section class="slide" id="slide-03">
+    <div class="slide-number">03</div>
+    <h2>Era 1 &mdash; Symbolic &amp; Statistical NLP (1948&ndash;2003)</h2>
+    <p>The era opens with <strong>Claude Shannon's 1948 <em>Mathematical Theory of Communication</em></strong>, which contained the first n-gram experiments &mdash; using English text to estimate letter and word probabilities. It closes with Yoshua Bengio's 2003 neural language model, although statistical methods kept winning benchmarks for years afterward.</p>
+
+    <h3>Two parallel programmes</h3>
+    <div class="diagram-grid cols-2">
+        <div class="diagram-panel r">
+            <h4>Chomskyan / symbolic</h4>
+            <p>Noam Chomsky's 1957 <em>Syntactic Structures</em> framed language as rule-governed and discrete. Ran for decades through Charniak, Marcus (Penn Treebank), Manning's early work. Strong on structure, brittle on coverage. Lost to data.</p>
+        </div>
+        <div class="diagram-panel y">
+            <h4>IBM / statistical</h4>
+            <p>Frederick Jelinek at IBM Watson (and later JHU): <em>"every time I fire a linguist, the performance of the speech recogniser goes up"</em>. The IBM Models 1&ndash;5 for word alignment (Brown, Della Pietra, Mercer, 1993) are the foundation of statistical MT.</p>
+        </div>
+    </div>
+
+    <div class="quote">
+        Whenever I fire a linguist our system performance improves.
+        <span class="attr">&mdash; Frederick Jelinek, IBM, ~1985 (frequently quoted in many forms; he later softened it)</span>
+    </div>
+
+    <h3>The five things you need to know from this era</h3>
+    <ul>
+        <li><strong>n-gram language models.</strong> P(word | last <em>n</em>&minus;1 words). Trivial to fit, hard to smooth (Kneser-Ney), still a useful baseline.</li>
+        <li><strong>HMMs &amp; the Viterbi algorithm.</strong> The toolbox of speech recognition for forty years. Rabiner's 1989 tutorial is one of the most cited engineering papers ever.</li>
+        <li><strong>IBM Models 1&ndash;5 &amp; phrase-based MT.</strong> The latent alignment idea reappears everywhere downstream.</li>
+        <li><strong>Penn Treebank (Mitch Marcus, 1993).</strong> The dataset that made supervised parsing possible.</li>
+        <li><strong>The CoNLL shared tasks.</strong> Fifteen years of public benchmarking that set the field's habits about evaluation.</li>
+    </ul>
+</section>
+
+<section class="slide" id="slide-04">
+    <div class="slide-number">04</div>
+    <h2>Era 2 &mdash; Neural Language Models (2003&ndash;2017)</h2>
+    <p>Neural networks were not new in 2003 &mdash; LeCun had MNIST in 1998, Schmidhuber and Hochreiter had LSTM in 1997. But the moment a neural net beat a statistical n-gram on language was Bengio's <em>A Neural Probabilistic Language Model</em> (2003).</p>
+
+    <p>For the next fourteen years, language modelling and neural NLP slowly displaced statistical methods. The pace picked up dramatically after 2012's AlexNet showed deep learning worked at scale.</p>
+
+    <div class="table-wrap">
+    <table>
+        <thead><tr><th>Year</th><th>Result</th><th>Why it mattered</th></tr></thead>
+        <tbody>
+            <tr><td>2003</td><td>Bengio NPLM</td><td>First neural net to beat n-grams on perplexity. Word embeddings born.</td></tr>
+            <tr><td>2010</td><td>Mikolov RNN-LM</td><td>Recurrent net + simple unrolling matches large n-gram models on speech recognition rescoring.</td></tr>
+            <tr><td>2013</td><td>word2vec (Mikolov et al, Google)</td><td>Word embeddings as a standalone artefact. <code>king &minus; man + woman &asymp; queen</code>.</td></tr>
+            <tr><td>2014</td><td>Sutskever / Vinyals / Le seq2seq + Cho GRU</td><td>Encoder-decoder pattern; LSTM as default. Translation becomes a neural pipeline.</td></tr>
+            <tr><td>2014</td><td>Bahdanau / Cho / Bengio attention</td><td>Soft alignment between encoder and decoder. The seed crystal of the transformer.</td></tr>
+            <tr><td>2015</td><td>ELMo / contextual embeddings (Peters et al)</td><td>Embeddings stop being a single vector per word; they become per-context.</td></tr>
+            <tr><td>2017</td><td>Transformer (Vaswani et al)</td><td>Throw away the recurrence. Attention is all you need.</td></tr>
+        </tbody>
+    </table>
+    </div>
+
+    <p>Notice the geographic story: <strong>Toronto, Mila/Montreal, NYU, and Google Brain</strong> dominate. This is the era when university labs were genuinely the centre of frontier work. That ends in 2018.</p>
+</section>
+
+<section class="slide" id="slide-05">
+    <div class="slide-number">05</div>
+    <h2>Era 3 &mdash; The Transformer Era (2017&ndash;2022)</h2>
+    <p>The transformer paper itself is deck 03 of this series. What matters here is what happened in the five years after it. Two camps formed almost immediately:</p>
+
+    <div class="diagram-grid cols-2">
+        <div class="diagram-panel y">
+            <h4>BERT camp &mdash; encoder, masked LM</h4>
+            <p>Google AI, Oct 2018. Devlin, Chang, Lee, Toutanova. Pretrain on masked language modelling, fine-tune for everything else. Dominated NLP benchmarks 2018&ndash;2020. The pattern most enterprise NLP still uses.</p>
+        </div>
+        <div class="diagram-panel g">
+            <h4>GPT camp &mdash; decoder, autoregressive</h4>
+            <p>OpenAI, Jun 2018 (GPT-1) &rarr; Feb 2019 (GPT-2) &rarr; May 2020 (GPT-3). Radford, Wu, Child, Kaplan, Hoffmann (later). Generative, scaled, zero-shot. The pattern that wins.</p>
+        </div>
+    </div>
+
+    <h3>The three discoveries that defined the era</h3>
+    <ul>
+        <li><strong>Scaling laws (Kaplan et al, OpenAI, 2020; Hoffmann et al / Chinchilla, DeepMind, 2022).</strong> Loss falls as a smooth power law in compute, data and parameters. Once true, the strategy is obvious: scale.</li>
+        <li><strong>In-context learning (GPT-3, 2020).</strong> A 175 B-parameter language model can be told a task in the prompt and just do it. The first hint of generality.</li>
+        <li><strong>RLHF (InstructGPT, 2022).</strong> Christiano, Ouyang, Wu, Lowe et al. Aligning a base model to human preferences with reinforcement learning on human comparisons. The hidden ingredient that made ChatGPT shippable.</li>
+    </ul>
+
+    <div class="callout">
+        <div class="callout-label">The strange thing about this era</div>
+        <p>Almost all of the <strong>scientific</strong> work was published openly. Papers, code, often weights. The change from open to closed happens quite cleanly with GPT-4 in early 2023. It is the boundary between Era 3 and Era 4.</p>
+    </div>
+</section>
+
+<section class="slide" id="slide-06">
+    <div class="slide-number">06</div>
+    <h2>Era 4 &mdash; Scaled Frontier &amp; Reasoning (2022&ndash;)</h2>
+    <p>The era opens with ChatGPT (30 November 2022) and is defined by a single fact: <strong>frontier models are now serious products with serious revenue, and the labs that build them act accordingly.</strong> The defining changes:</p>
+
+    <div class="diagram-grid cols-2">
+        <div class="diagram-panel accent-border">
+            <h4>What changed for the labs</h4>
+            <ul>
+                <li>Closed weights become the norm at the frontier.</li>
+                <li>Frontier training runs cost $50&ndash;500 M.</li>
+                <li>Each lab has dedicated alignment / safety teams.</li>
+                <li>Government engagement is now part of the job.</li>
+            </ul>
+        </div>
+        <div class="diagram-panel r">
+            <h4>What changed for the models</h4>
+            <ul>
+                <li>Mixture-of-Experts becomes default at frontier.</li>
+                <li>Long context (1M+ tokens at Gemini, Claude).</li>
+                <li>Multimodal (vision, audio, video) is table stakes.</li>
+                <li>Test-time compute &mdash; o1 (Sep 2024), R1 (Jan 2025).</li>
+                <li>Agents &mdash; Computer Use (Oct 2024), Operator, Project Mariner.</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>The geography flips again. Era 2 was university labs; Era 3 was a handful of US industry labs; Era 4 is multipolar &mdash; six US labs, a major British arm of Google, four to six serious Chinese labs, and an open-weight ecosystem orbiting Meta, Mistral, Qwen and DeepSeek.</p>
+
+    <div class="callout g">
+        <div class="callout-label">The R1 moment &mdash; January 2025</div>
+        <p>DeepSeek R1 was released with open weights and a paper, matched OpenAI o1 on most benchmarks, and reportedly cost a tiny fraction of a US frontier run. It is the moment the question <em>is the frontier still mostly American?</em> stopped being rhetorical. Deck 09 is dedicated to this.</p>
+    </div>
+</section>
+
+<section class="slide" id="slide-07">
+    <div class="slide-number">07</div>
+    <h2>The People Thread &mdash; The Three Godfathers</h2>
+    <p>The intellectual lineage of modern LLMs runs through three people. They shared the 2018 Turing Award and have been called <em>the Godfathers of Deep Learning</em> ever since. Their direct and indirect students built almost all the labs you have heard of.</p>
+
+    <div class="person-card">
+        <div class="person-photo">GH</div>
+        <div>
+            <h4>Geoffrey Hinton</h4>
+            <div class="role">Toronto, Google Brain (2013&ndash;2023), Vector Institute</div>
+            <p>Backprop (with Rumelhart and Williams, 1986), Boltzmann machines, dropout, capsule networks. Direct supervisor of Sutskever, Salakhutdinov, Krizhevsky, Graves, Mnih and Vinyals. Resigned from Google in 2023 specifically so he could speak about AI risk.</p>
+        </div>
+    </div>
+
+    <div class="person-card">
+        <div class="person-photo">YB</div>
+        <div>
+            <h4>Yoshua Bengio</h4>
+            <div class="role">Universit&eacute; de Montr&eacute;al, MILA founder</div>
+            <p>Neural language model 2003, attention with Bahdanau and Cho 2014, GANs (with Goodfellow as student). MILA is the largest deep-learning academic group in the world. Now devotes most of his time to AI safety.</p>
+        </div>
+    </div>
+
+    <div class="person-card">
+        <div class="person-photo">YL</div>
+        <div>
+            <h4>Yann LeCun</h4>
+            <div class="role">NYU, Meta AI / FAIR Chief Scientist</div>
+            <p>Convolutional networks (1989), MNIST, the lead voice for open-weight research and a vocal critic of pure-LLM AGI roadmaps. JEPA / world-model proposal is his counter-programme. Made Llama possible.</p>
+        </div>
+    </div>
+
+    <div class="callout">
+        <div class="callout-label">Why this matters for reading papers</div>
+        <p>Roughly: if a paper is from Toronto, Google Brain (pre-2023) or DeepMind, expect a Hinton trace. If from Mila, NYU pre-2010, or Meta AI, expect Bengio or LeCun. If from OpenAI or Anthropic, expect ex-Brain ex-DeepMind people whose advisors trace to one of the three. Deck 04 maps this in detail.</p>
+    </div>
+</section>
+
+<section class="slide" id="slide-08">
+    <div class="slide-number">08</div>
+    <h2>The Lab Geography</h2>
+    <p>For an outsider the field looks crowded. From inside it is dramatically smaller than that &mdash; perhaps fifteen labs that genuinely matter, clustered around a handful of cities.</p>
+
+    <div class="diagram-grid cols-3">
+        <div class="diagram-panel accent-border">
+            <h4>San Francisco Bay Area</h4>
+            <p>OpenAI (Mission), Anthropic (SoMa), Google DeepMind (Mountain View, plus the old Brain campus), Meta AI (Menlo Park), xAI (Palo Alto/SF), Stanford NLP, Berkeley AI Research.</p>
+        </div>
+        <div class="diagram-panel y">
+            <h4>London &amp; Europe</h4>
+            <p>Google DeepMind (King's Cross, the original), Mistral (Paris), Meta AI Paris (FAIR FAIR), UK AISI, the Oxford / Cambridge groups, Reka.</p>
+        </div>
+        <div class="diagram-panel g">
+            <h4>China</h4>
+            <p>DeepSeek (Hangzhou via High-Flyer), Qwen / Alibaba DAMO (Hangzhou), Moonshot / Zhipu / MiniMax (Beijing), Baidu (Beijing), Tencent (Shenzhen), 01.AI (Beijing).</p>
+        </div>
+        <div class="diagram-panel r">
+            <h4>Toronto / Montreal</h4>
+            <p>Vector Institute (Toronto, Hinton-aligned), MILA (Montreal, Bengio-aligned), Cohere (Toronto, Aidan Gomez), Element AI legacy.</p>
+        </div>
+        <div class="diagram-panel">
+            <h4>NYC / Boston / Seattle</h4>
+            <p>NYU (LeCun), MIT, Princeton (Narayanan, Chen), Allen AI, Microsoft Research (Redmond), Boston University.</p>
+        </div>
+        <div class="diagram-panel">
+            <h4>Pittsburgh</h4>
+            <p>CMU (Salakhutdinov, Mitchell, Cohen, Singh), the second-most-cited NLP lab in the US after Stanford.</p>
+        </div>
+    </div>
+
+    <div class="callout y">
+        <div class="callout-label">A pattern</div>
+        <p>The frontier lab founders tend to physically locate near their <strong>academic origins or their target talent pool</strong> rather than near customers. Anthropic is in San Francisco because its founders left OpenAI and lived there. DeepMind stayed in London because Demis Hassabis lives there. xAI clusters in SF for the same reason as everyone else: that is where the senior IC pool is.</p>
+    </div>
+</section>
+
+<section class="slide" id="slide-09">
+    <div class="slide-number">09</div>
+    <h2>Three Threads Running Through It All</h2>
+    <p>Across all four eras there are a few persistent through-lines &mdash; arguments and tensions that keep recurring, even when the technology underneath has changed completely.</p>
+
+    <h3>Thread 1 &mdash; Statistics vs symbols</h3>
+    <p>It is older than this story. Chomsky vs Jelinek in the 1980s; LeCun vs Marcus today. Each generation has a version of <em>"is intelligence built on rules or on statistics?"</em>, and each generation, the statistical side wins another notch. We are not done.</p>
+
+    <h3>Thread 2 &mdash; Open vs closed</h3>
+    <p>BBN published. IBM published. Google published BERT and the transformer. OpenAI published GPT-2 and GPT-3. Then GPT-4 was a black box. Then Llama was open. Then DeepSeek R1. The default keeps moving and the question is genuinely contested.</p>
+
+    <h3>Thread 3 &mdash; Capability vs safety</h3>
+    <p>The phrase did not exist before Bostrom's 2014 <em>Superintelligence</em>. By 2016 it was the founding rationale for OpenAI. By 2021 it caused the split that produced Anthropic. By 2023 it produced the OpenAI board crisis. The argument is still live and is one of the few that genuinely constrains what gets built.</p>
+
+    <div class="callout">
+        <div class="callout-label">Why these three</div>
+        <p>Each of them comes back in <em>every</em> later deck. The OpenAI deck (05) is partly the story of the safety thread breaking. The Anthropic deck (06) is the story of it holding. The Meta deck (08) is the open vs closed thread. The future-directions deck (10) is essentially a forecast of which way each thread bends next.</p>
+    </div>
+</section>
+
+<section class="slide" id="slide-10">
+    <div class="slide-number">10</div>
+    <h2>Interactive Timeline</h2>
+    <p>The 70-year arc as a single scrollable list. The colour stripe in each row indicates which era the event sits in (red &mdash; statistical; amber &mdash; neural pre-Transformer; violet &mdash; transformer; green &mdash; scaled frontier).</p>
+
+    <div class="canvas-wrap">
+    <div class="timeline">
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent-2);">1948</div><div class="tl-event"><strong>Shannon</strong> &mdash; <em>A Mathematical Theory of Communication</em>. First n-gram experiments on English.</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent-2);">1957</div><div class="tl-event"><strong>Chomsky</strong> &mdash; <em>Syntactic Structures</em>. Symbolic linguistics for the next 40 years.</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent-2);">1986</div><div class="tl-event"><strong>Rumelhart, Hinton, Williams</strong> &mdash; backprop paper. <em>Parallel Distributed Processing</em>.</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent-2);">1989</div><div class="tl-event"><strong>LeCun</strong> &mdash; LeNet, convolutional networks for handwritten digits at Bell Labs.</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent-2);">1993</div><div class="tl-event"><strong>Brown et al, IBM</strong> &mdash; IBM Models 1&ndash;5 of statistical machine translation.</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent-2);">1997</div><div class="tl-event"><strong>Hochreiter &amp; Schmidhuber</strong> &mdash; LSTM.</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent-3);">2003</div><div class="tl-event"><strong>Bengio et al</strong> &mdash; <em>A Neural Probabilistic Language Model</em>. Era 2 begins.</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent-3);">2010</div><div class="tl-event"><strong>DeepMind founded</strong> by Hassabis, Suleyman and Legg in London.</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent-3);">2011</div><div class="tl-event"><strong>Google Brain</strong> founded by Jeff Dean, Andrew Ng and Greg Corrado.</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent-3);">2012</div><div class="tl-event"><strong>AlexNet</strong> &mdash; Krizhevsky, Sutskever, Hinton. ImageNet by 10 points. Deep learning becomes mainstream.</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent-3);">2013</div><div class="tl-event"><strong>word2vec</strong> &mdash; Mikolov, Chen, Corrado, Dean (Google). DeepMind acquired by Google for ~$500 M.</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent-3);">2014</div><div class="tl-event"><strong>Seq2seq</strong> (Sutskever / Vinyals / Le); <strong>Bahdanau attention</strong>; <strong>GANs</strong> (Goodfellow).</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent-3);">2015</div><div class="tl-event"><strong>OpenAI founded</strong> &mdash; Altman, Brockman, Sutskever, Musk, Karpathy.</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent-3);">2016</div><div class="tl-event"><strong>AlphaGo</strong> beats Lee Sedol on TPU v1. Google Translate switches to neural.</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent);">2017</div><div class="tl-event"><strong>"Attention Is All You Need"</strong> &mdash; Vaswani et al, NeurIPS. Era 3 begins.</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent);">2018</div><div class="tl-event"><strong>BERT</strong> (Google) and <strong>GPT-1</strong> (OpenAI).</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent);">2019</div><div class="tl-event"><strong>GPT-2</strong> staged release; <strong>T5</strong>; OpenAI takes Microsoft's $1B.</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent);">2020</div><div class="tl-event"><strong>GPT-3</strong> (175 B). <strong>Scaling Laws</strong> (Kaplan et al). In-context learning is real.</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent);">2021</div><div class="tl-event"><strong>Anthropic founded</strong> by Amodei + 6 OpenAI alumni. Codex / Copilot launches.</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent);">2022</div><div class="tl-event"><strong>InstructGPT</strong> + <strong>Chinchilla</strong>. <strong>ChatGPT</strong> ships 30 November. Era 4 begins.</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent-4);">2023</div><div class="tl-event"><strong>GPT-4</strong>, <strong>Llama</strong> (and Llama-2), <strong>Claude</strong>, <strong>Gemini 1</strong>. OpenAI board crisis (Nov). Brain &amp; DeepMind merge.</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent-4);">2024</div><div class="tl-event"><strong>Claude 3 Opus</strong>, <strong>GPT-4o</strong>, <strong>o1</strong>, Llama-3, Grok-2, Computer Use.</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent-4);">2025</div><div class="tl-event"><strong>DeepSeek R1</strong> (Jan), <strong>GPT-5</strong>, <strong>Claude 4</strong>, Gemini 2.5, agents become standard.</div></div>
+        <div class="tl-row"><div class="tl-year" style="color:var(--accent-4);">2026</div><div class="tl-event">Multipolar frontier. Open-weight Chinese models compete on capability. The story is still being written.</div></div>
+    </div>
+    </div>
+</section>
+
+<section class="slide" id="slide-11">
+    <div class="slide-number">11</div>
+    <h2>How to Read the Rest of This Series</h2>
+    <p>The remaining nine decks split into three groups. The technical spine, the lab profiles, and the forecast.</p>
+
+    <div class="diagram-grid cols-3">
+        <div class="diagram-panel accent-border">
+            <h4>Technical spine &mdash; read in order</h4>
+            <ul>
+                <li><a href="https://brendanjameslynskey.github.io/LLM_History_02_Pre_Transformer_NLP/">02 &mdash; Pre-Transformer NLP</a></li>
+                <li><a href="https://brendanjameslynskey.github.io/LLM_History_03_The_Transformer/">03 &mdash; The Transformer Paper</a></li>
+                <li><a href="https://brendanjameslynskey.github.io/LLM_History_04_University_Labs/">04 &mdash; University Labs</a></li>
+            </ul>
+        </div>
+        <div class="diagram-panel y">
+            <h4>Lab profiles &mdash; any order</h4>
+            <ul>
+                <li><a href="https://brendanjameslynskey.github.io/LLM_History_05_OpenAI/">05 &mdash; OpenAI</a></li>
+                <li><a href="https://brendanjameslynskey.github.io/LLM_History_06_Anthropic/">06 &mdash; Anthropic</a></li>
+                <li><a href="https://brendanjameslynskey.github.io/LLM_History_07_DeepMind_and_Google/">07 &mdash; DeepMind</a></li>
+                <li><a href="https://brendanjameslynskey.github.io/LLM_History_08_Meta_Mistral_xAI_Others/">08 &mdash; Meta, Mistral, xAI &amp; Others</a></li>
+                <li><a href="https://brendanjameslynskey.github.io/LLM_History_09_Chinese_Labs/">09 &mdash; Chinese Labs</a></li>
+            </ul>
+        </div>
+        <div class="diagram-panel g">
+            <h4>Forecast &mdash; reads alone</h4>
+            <ul>
+                <li><a href="https://brendanjameslynskey.github.io/LLM_History_10_Future_Directions/">10 &mdash; Future Directions</a></li>
+            </ul>
+            <p style="margin-top:0.5rem;">Will date faster than the others; deliberately so.</p>
+        </div>
+    </div>
+
+    <div class="callout">
+        <div class="callout-label">A note on what this series does not cover</div>
+        <p>The technical content of LLMs is in the rest of the LLMs hub &mdash; not here. <a href="https://github.com/BrendanJamesLynskey/LLM_Hub_Transformer_Architecture">Transformer Architecture</a>, <a href="https://github.com/BrendanJamesLynskey/LLM_Hub_Modern_Architectures">Modern Architectures</a>, <a href="https://github.com/BrendanJamesLynskey/LLM_Hub_Fine_Tuning">Fine Tuning</a>, <a href="https://github.com/BrendanJamesLynskey/LLM_Hub_Reasoning">Reasoning</a> all dive into the engineering. This series provides the <em>context</em> for those decks, not a replacement.</p>
+    </div>
+</section>
+
+<section class="slide" id="slide-12">
+    <div class="slide-number">12</div>
+    <h2>Cheat Sheet</h2>
+
+    <div class="diagram-grid cols-2">
+        <div class="diagram-panel accent-border">
+            <h4>Four eras</h4>
+            <ul>
+                <li><strong>Symbolic / statistical</strong> &mdash; Shannon to early-2000s. Chomsky vs IBM.</li>
+                <li><strong>Neural pre-Transformer</strong> &mdash; Bengio 2003 to Vaswani 2017.</li>
+                <li><strong>Transformer</strong> &mdash; 2017 to ChatGPT.</li>
+                <li><strong>Scaled frontier</strong> &mdash; ChatGPT onwards. Closed weights, expensive runs, agents.</li>
+            </ul>
+        </div>
+        <div class="diagram-panel y">
+            <h4>Three godfathers</h4>
+            <ul>
+                <li>Hinton &mdash; Toronto / Brain. Backprop, students everywhere.</li>
+                <li>Bengio &mdash; MILA. Neural LM, attention.</li>
+                <li>LeCun &mdash; NYU / Meta. CNNs, JEPA, open-weights advocate.</li>
+            </ul>
+        </div>
+        <div class="diagram-panel g">
+            <h4>Three through-lines</h4>
+            <ul>
+                <li>Statistics vs symbols.</li>
+                <li>Open vs closed.</li>
+                <li>Capability vs safety.</li>
+            </ul>
+        </div>
+        <div class="diagram-panel r">
+            <h4>Six big numbers</h4>
+            <ul>
+                <li>1948 &mdash; Shannon.</li>
+                <li>2003 &mdash; Bengio NPLM.</li>
+                <li>2017 &mdash; Transformer.</li>
+                <li>2020 &mdash; GPT-3 (175 B).</li>
+                <li>2022 &mdash; ChatGPT.</li>
+                <li>2025 &mdash; DeepSeek R1.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <p>Part of the <a href="https://github.com/BrendanJamesLynskey/LLM_Hub_LLM_History">LLM History series</a> in the <a href="https://github.com/BrendanJamesLynskey/LLMs">LLMs hub</a>.</p>
+    <p style="margin-top: 0.5rem;">Next: <a href="https://brendanjameslynskey.github.io/LLM_History_02_Pre_Transformer_NLP/">02 &mdash; Pre-Transformer NLP &rarr;</a></p>
+</footer>
+
+</body>
+</html>
